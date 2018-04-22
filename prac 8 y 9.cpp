@@ -6,11 +6,11 @@
 //*************		Visual Studio 2015						******//
 //************************************************************//
 #include "texture.h"
+#include "Camera.h"
 
 
-float pos_camX = 0, pos_camY = 0, pos_camZ = -5; 
+float pos_camX = 0, pos_camY = 0, pos_camZ = -5;
 int eye_camX = 0, eye_camY = 0.0, eye_camZ = 0;
-
 
 GLfloat Diffuse[]= { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
 GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
@@ -21,7 +21,10 @@ GLfloat Position2[]= { 0.0f, -5.0f, 0.0f, 1.0f };			// Light Position
 CTexture t_Ajedrez1;
 CTexture t_Ajedrez2;
 CTexture t_metal01;
+CTexture t_metal01Trans;
 CTexture t_madera;
+CTexture t_maderaTrans;
+
 
 
 int font=(int)GLUT_BITMAP_TIMES_ROMAN_24;
@@ -33,8 +36,6 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	glClearColor(0.5f, 0.5f, 0.8f, 0.0f);				// Azul de fondo	
 
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.0f);
 
 	//glShadeModel (GL_SMOOTH);
 	glLightfv(GL_LIGHT0, GL_POSITION, Position);
@@ -50,7 +51,7 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	t_Ajedrez1.BuildGLTexture();
 	t_Ajedrez1.ReleaseImage();
 
-	t_metal01.LoadTGA("metal2.tga");
+	t_metal01.LoadBMP("metal2.bmp");
 	t_metal01.BuildGLTexture();
 	t_metal01.ReleaseImage();
 
@@ -58,9 +59,17 @@ void InitGL ( GLvoid )     // Inicializamos parametros
 	t_Ajedrez2.BuildGLTexture();
 	t_Ajedrez2.ReleaseImage();
 
-	t_madera.LoadBMP("madera1.bmp");
+	t_maderaTrans.LoadTGA("maderaTrans.tga");
+	t_maderaTrans.BuildGLTexture();
+	t_maderaTrans.ReleaseImage();
+
+	t_madera.LoadTGA("madera.tga");
 	t_madera.BuildGLTexture();
 	t_madera.ReleaseImage();
+
+	t_metal01Trans.LoadTGA("metal01Trans.tga");
+	t_metal01Trans.BuildGLTexture();
+	t_metal01Trans.ReleaseImage();
 }
 
 
@@ -78,7 +87,7 @@ void renderBitmapCharacter(float x, float y, float z, void *font,char *string)
 
 
 
-void prisma (GLuint textura1, GLuint textura2, GLuint textura3)  //Funcion creacion prisma
+void prisma (GLuint textura1, GLuint textura2)  //Funcion creacion prisma
 {
 
 	GLfloat vertice [8][3] = {
@@ -127,7 +136,6 @@ void prisma (GLuint textura1, GLuint textura2, GLuint textura3)  //Funcion creac
 			glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertice[2]);
 		glEnd();
 
-		glBindTexture(GL_TEXTURE_2D, textura3);//choose the texture to use.
 		glBegin(GL_POLYGON);  //Bottom
 			glNormal3f( 0.0f,-1.0f, 0.0f);
 			glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);
@@ -155,304 +163,322 @@ void display ( void )   // Creamos la funcion donde se dibuja
 
 	glPushMatrix();
 	glTranslatef(pos_camX, pos_camY, pos_camZ);
-		glRotatef(eye_camX, 1.0, 0.0, 0.0);
-		glRotatef(eye_camY, 0.0, 1.0, 0.0);
-		glRotatef(eye_camZ, 0.0, 0.0, 1.0);
-	
+	glRotatef(eye_camX, 1.0, 0.0, 0.0);
+	glRotatef(eye_camY, 0.0, 1.0, 0.0);
+	glRotatef(eye_camZ, 0.0, 0.0, 1.0);
+
 		glPushMatrix(); 
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0,1.0,1.0);  
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(1.0,0.0,0.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(0.0, 0.0, 1.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(0.0, 0.0, 2.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(0.0, 0.0, 3.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(2.0, 0.0, 0.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(3.0, 0.0, 0.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(1.0, 0.0, 1.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(1.0, 0.0, 2.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(1.0, 0.0, 3.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(2.0, 0.0, 1.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(2.0, 0.0, 2.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(2.0, 0.0, 3.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(3.0, 0.0, 1.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(3.0, 0.0, 2.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 1.0);
 			glTranslatef(3.0, 0.0, 3.0);
-			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_Ajedrez1.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(0.0, 0.0, -1.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(1.0, 0.0, -1.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(2.0, 0.0, -1.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(3.0, 0.0, -1.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(0.0, 0.0,7.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(1.0, 0.0,7.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 			glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(2.0, 0.0,7.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 			glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(3.0, 0.0,7.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.0, 1.0, 0.5);
 			glTranslatef(3, 0.0,7.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0,1.0);
 			glTranslatef(-3.80, 0.0,-0.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(-3.80, 0.0,0.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(-3.80, 0.0,1.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(-3.80, 0.0,2.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(-3.80, 0.0, 3.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(23.80, 0.0, -0.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 			glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(23.80, 0.0, 0.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(23.80, 0.0, 1.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(23.80, 0.0, 2.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 			glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.3, 1.0, 1.0);
 			glTranslatef(23.80, 0.0, 3.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01.GLindex, t_metal01.GLindex);
 		glPopMatrix();
 
 		/***PATAS****/
+		glDisable(GL_LIGHTING);
+		glEnable(GL_ALPHA_TEST);
+		//glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+		glAlphaFunc(GL_GREATER, 0.1);
+		glEnable(GL_BLEND);     // Turn Blending On
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glPushMatrix();
-			glColor4f(1.0, 1.0, 1.0,1.0);
+			glColor3f(1.0, 1.0, 1.0);
 			glScalef(1.0, 5.0, 1.0);
 			glTranslatef(-0.78,-0.60,-0.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01Trans.GLindex,t_metal01Trans.GLindex);
 		glPopMatrix();
 		glPushMatrix();
-			glColor4f(1.0, 1.0, 1.0,0.0);
+			glColor3f(1.0, 1.0, 1.0);
 			glScalef(1.0, 5.0, 1.0);
 			glTranslatef(6.80, -0.60, -0.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01Trans.GLindex, t_metal01Trans.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(1.0, 5.0, 1.0);
 			glTranslatef(-0.78,-0.60,3.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01Trans.GLindex, t_metal01Trans.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(1.0, 5.0, 1.0);
 			glTranslatef(6.80, -0.60,3.5);
-			prisma(t_metal01.GLindex, t_metal01.GLindex, t_metal01.GLindex);
+			prisma(t_metal01Trans.GLindex, t_metal01Trans.GLindex);
 		glPopMatrix();
+		glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+		glDisable(GL_ALPHA_TEST);
 
 		/********SILLA1********/
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.5,0.5,2.5);
 			glTranslatef(-2.0, -3.0,0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			prisma(t_madera.GLindex, t_madera.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.5,2.5, 2.5);
 			glTranslatef(-8.0,-1.2,0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			prisma(t_madera.GLindex, t_madera.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.5, 2.5, 2.5);
 			glTranslatef(-12.0, -1.2, 0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			prisma(t_madera.GLindex, t_madera.GLindex);
 		glPopMatrix();
 		glPushMatrix();
+			glDisable(GL_LIGHTING);
+			glEnable(GL_ALPHA_TEST);
+			//glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+			glAlphaFunc(GL_GREATER, 0.1);
+			//glEnable(GL_BLEND);     // Turn Blending On
+			//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.5, 2.5, 2.5);
 			glTranslatef(-12.0,0.0, 0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex,t_madera.GLindex);
+			prisma(t_maderaTrans.GLindex, t_maderaTrans.GLindex);
+			glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+			glDisable(GL_ALPHA_TEST);
 		glPopMatrix();
 
 		/*******SILLA2******/
+		
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(2.5, 0.5, 2.5);
 			glTranslatef(4.5, -4.0, 0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			prisma(t_madera.GLindex, t_madera.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.5, 2.5, 2.5);
 			glTranslatef(24.5, -1.4, 0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			prisma(t_madera.GLindex, t_madera.GLindex);
 		glPopMatrix();
 		glPushMatrix();
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.5, 2.5, 2.5);
 			glTranslatef(20.5, -1.4, 0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			prisma(t_madera.GLindex, t_madera.GLindex);
 		glPopMatrix();
 		glPushMatrix();
+			glDisable(GL_LIGHTING);
+			glEnable(GL_ALPHA_TEST);
+			//glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+			glAlphaFunc(GL_GREATER, 0.1);
+			//glEnable(GL_BLEND);     // Turn Blending On
+			//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			glColor3f(1.0, 1.0, 1.0);
 			glScalef(0.5, 2.5, 2.5);
-			glTranslatef(24.5,-0.4, 0.75);
-			prisma(t_madera.GLindex, t_madera.GLindex, t_madera.GLindex);
+			glTranslatef(24.5,-0.2, 0.75);
+			prisma(t_maderaTrans.GLindex, t_maderaTrans.GLindex);
+			glDisable(GL_DEPTH_TEST);   // Turn Depth Testing Off
+			glDisable(GL_ALPHA_TEST);
 		glPopMatrix();
-
-		/*glPushMatrix();
-			glColor3f(1.0, 1.0, 1.0);
-			glScalef(0.5, 2.5, 2.5);
-			glTranslatef(30, -0.4, 0.75);
-			prisma(t_metal01.GLindex, t_Ajedrez1.GLindex, t_madera.GLindex);
-		glPopMatrix();*/
 
 
 	glPopMatrix();
@@ -495,34 +521,34 @@ void animacion()
 void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 {
 	switch ( key ) {
-		case 'w':   //Movimientos de camara
-		case 'W':
-			pos_camZ += 0.5f;
-			//eye_camZ -= 0.5f;
-			break;
+	case 'w':   //Movimientos de camara
+	case 'W':
+		pos_camZ += 0.5f;
+		//eye_camZ -= 0.5f;
+		break;
 
-		case 's':
-		case 'S':
-			pos_camZ -= 0.5f;
-			//eye_camZ += 0.5f;
-			break;
+	case 's':
+	case 'S':
+		pos_camZ -= 0.5f;
+		//eye_camZ += 0.5f;
+		break;
 
-		case 'a':
-		case 'A':
-			pos_camX += 0.5f;
-			//eye_camX -= 0.5f;
-			break;
-		case 'd':
-		case 'D':
-			pos_camX -= 0.5f;
-			//eye_camX += 0.5f;
-			break;
+	case 'a':
+	case 'A':
+		pos_camX += 0.5f;
+		//eye_camX -= 0.5f;
+		break;
+	case 'd':
+	case 'D':
+		pos_camX -= 0.5f;
+		//eye_camX += 0.5f;
+		break;
 
-		case 27:        // Cuando Esc es presionado...
-			exit ( 0 );   // Salimos del programa
-			break;        
-		default:        // Cualquier otra
-			break;
+	case 27:        // Cuando Esc es presionado...
+		exit(0);   // Salimos del programa
+		break;
+	default:        // Cualquier otra
+		break;
   }
 	glutPostRedisplay();
 }
@@ -530,33 +556,33 @@ void keyboard ( unsigned char key, int x, int y )  // Create Keyboard Function
 void arrow_keys ( int a_keys, int x, int y )  // Funcion para manejo de teclas especiales (arrow keys)
 {
   switch ( a_keys ) {
-	case GLUT_KEY_PAGE_UP:
-		pos_camY -= 0.5f;
-		//eye_camY += 0.5f;
-		break;
+  case GLUT_KEY_PAGE_UP:
+	  pos_camY -= 0.5f;
+	  //eye_camY += 0.5f;
+	  break;
 
-	case GLUT_KEY_PAGE_DOWN:
-		pos_camY += 0.5f;
-		//eye_camY -= 0.5f;
-		break;
+  case GLUT_KEY_PAGE_DOWN:
+	  pos_camY += 0.5f;
+	  //eye_camY -= 0.5f;
+	  break;
 
-    case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
-		eye_camX = (eye_camX-15) % 360;
-		break;
+  case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
+	  eye_camX = (eye_camX - 15) % 360;
+	  break;
 
-    case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
-		eye_camX = (eye_camX+15) % 360;
-		break;
+  case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
+	  eye_camX = (eye_camX + 15) % 360;
+	  break;
 
-	case GLUT_KEY_LEFT:
-		eye_camY = (eye_camY-15) % 360;
-		break;
+  case GLUT_KEY_LEFT:
+	  eye_camY = (eye_camY - 15) % 360;
+	  break;
 
-	case GLUT_KEY_RIGHT:
-		eye_camY = (eye_camY+15) % 360;
-		break;
-    default:
-      break;
+  case GLUT_KEY_RIGHT:
+	  eye_camY = (eye_camY + 15) % 360;
+	  break;
+  default:
+	  break;
   }
   glutPostRedisplay();
 }
